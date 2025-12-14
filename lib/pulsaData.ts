@@ -11,14 +11,14 @@ export const pulsaProviders: PulsaProvider[] = [
     id: "axis",
     name: "Axis",
     provider: "PT XL Axiata Tbk",
-    image: "/placeholder-game.jpg",
+    image: "/axis 1.jpg",
     bgColor: "from-purple-600 to-pink-600",
   },
   {
     id: "byu",
     name: "by.U",
     provider: "by.U",
-    image: "/placeholder-game.jpg",
+    image: "/by.u 1.png",
     bgColor: "from-cyan-400 to-blue-500",
   },
   {
@@ -32,14 +32,14 @@ export const pulsaProviders: PulsaProvider[] = [
     id: "smartfren",
     name: "Smartfren",
     provider: "Smartfren",
-    image: "/placeholder-game.jpg",
+    image: "/smartfren 1.jpg",
     bgColor: "from-pink-500 to-rose-600",
   },
   {
     id: "tri",
     name: "Tri (3)",
     provider: "Tri Indonesia",
-    image: "/placeholder-game.jpg",
+    image: "/tri 1.jpg",
     bgColor: "from-purple-500 to-pink-500",
   },
   {
@@ -53,7 +53,7 @@ export const pulsaProviders: PulsaProvider[] = [
     id: "xl-axiata",
     name: "XL Axiata",
     provider: "PT XL Axiata Tbk",
-    image: "/placeholder-game.jpg",
+    image: "/xl 1.png",
     bgColor: "from-blue-700 to-indigo-800",
   },
 ];
