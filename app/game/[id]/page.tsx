@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { useGame } from "@/contexts/GameContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -21,6 +21,26 @@ export default function GameDetailPage() {
 
   const [gameUserId, setGameUserId] = useState("");
   const [selectedItem, setSelectedItem] = useState<string>("");
+  const [promoCode, setPromoCode] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+
+  const itemsPerPage = 10; // 5 baris x 2 kolom
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = items.slice(startIndex, endIndex);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   if (!game) {
     return (
@@ -80,6 +100,7 @@ Game: ${game.name}
 Item: ${item.name}
 ID Game/User ID: ${gameUserId.trim()}
 Harga: Rp ${item.price.toLocaleString("id-ID")}
+${promoCode.trim() ? `Kode Promo: ${promoCode.trim()}` : ""}
 
 *Waktu Pesanan:*
 ${new Date().toLocaleString("id-ID", {
@@ -99,6 +120,7 @@ Mohon diproses ya kak!
 
     setGameUserId("");
     setSelectedItem("");
+    setPromoCode("");
 
     setTimeout(() => {
       router.push("/orders");
@@ -143,22 +165,45 @@ Mohon diproses ya kak!
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Pilih Nominal</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {items.map((item) => (
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-sm font-medium text-gray-700">Pilih Nominal</label>
+                    {totalPages > 1 && (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handlePrevPage}
+                          disabled={currentPage === 0}
+                          className="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Previous page"
+                        >
+                          <ChevronLeft size={20} />
+                        </button>
+                        <span className="text-sm text-gray-600">
+                          {currentPage + 1} / {totalPages}
+                        </span>
+                        <button
+                          onClick={handleNextPage}
+                          disabled={currentPage === totalPages - 1}
+                          className="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Next page"
+                        >
+                          <ChevronRight size={20} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {currentItems.map((item) => (
                       <button
                         key={item.id}
                         onClick={() => setSelectedItem(item.id)}
                         className={`p-4 border-2 rounded-lg text-left transition-all ${selectedItem === item.id ? "border-purple-600 bg-purple-50" : "border-gray-300 hover:border-purple-400"}`}
                       >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
+                        <div className="flex flex-col gap-2">
+                          <div>
                             <p className="font-semibold text-gray-800">{item.name}</p>
-                            <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                            <p className="text-xs text-gray-600 mt-1">{item.description}</p>
                           </div>
-                          <div className="text-right ml-4">
-                            <p className="font-bold text-purple-600">Rp {item.price.toLocaleString("id-ID")}</p>
-                          </div>
+                          <p className="font-bold text-purple-600">Rp {item.price.toLocaleString("id-ID")}</p>
                         </div>
                       </button>
                     ))}
@@ -166,8 +211,8 @@ Mohon diproses ya kak!
                 </div>
 
                 {selectedItemData && (
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <h3 className="font-semibold text-gray-800 mb-2">Ringkasan Pembelian</h3>
+                  <div className="bg-purple-50 p-4 rounded-lg space-y-3">
+                    <h3 className="font-semibold text-gray-800">Ringkasan Pembelian</h3>
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Item:</span>
@@ -177,6 +222,17 @@ Mohon diproses ya kak!
                         <span className="text-gray-600">Harga:</span>
                         <span className="font-medium">Rp {selectedItemData.price.toLocaleString("id-ID")}</span>
                       </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-purple-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Kode Promo (Opsional)</label>
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                        placeholder="Masukkan kode promo"
+                      />
                     </div>
                   </div>
                 )}

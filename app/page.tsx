@@ -24,7 +24,7 @@ interface Banner {
 }
 
 export default function Home() {
-  const { featuredGames, games } = useGame();
+  const { games } = useGame();
   const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>("Top Up Games");
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -266,7 +266,7 @@ export default function Home() {
               return (
                 <Link
                   key={provider.id}
-                  href={`/game/${provider.id}`}
+                  href="/pulsa-data"
                   className="bg-gray-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-purple-500 transition-all duration-300 group"
                 >
                   <div className="relative h-40">
@@ -293,10 +293,25 @@ export default function Home() {
 
             {selectedCategory === "Voucher" && displayedItems.map((item) => {
               const voucher = item as VoucherItem;
+
+              // Tentukan URL berdasarkan voucher ID
+              const getVoucherUrl = (id: string) => {
+                switch(id) {
+                  case "steam-wallet":
+                    return "/voucher/steam";
+                  case "google-play":
+                    return "/voucher/google-play";
+                  case "playstation-store":
+                    return "/voucher/playstation";
+                  default:
+                    return `/game/${id}`;
+                }
+              };
+
               return (
                 <Link
                   key={voucher.id}
-                  href={`/game/${voucher.id}`}
+                  href={getVoucherUrl(voucher.id)}
                   className="bg-gray-800 rounded-xl overflow-hidden hover:ring-2 hover:ring-purple-500 transition-all duration-300 group"
                 >
                   <div className="relative h-40">
