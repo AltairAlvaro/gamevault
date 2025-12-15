@@ -22,6 +22,7 @@ export interface GameItem {
   price: number;
   stock: number;
   description: string;
+  category?: "diamond" | "membership";
 }
 
 export interface Order {

@@ -19,16 +19,29 @@ export default function GameDetailPage() {
   const game = getGameById(gameId);
   const items = getGameItems(gameId);
 
+  // Pisahkan membership dan diamond items
+  const membershipItems = items.filter((item) => item.category === "membership");
+  const diamondItems = items.filter((item) => item.category === "diamond" || !item.category);
+
   const [gameUserId, setGameUserId] = useState("");
   const [selectedItem, setSelectedItem] = useState<string>("");
   const [promoCode, setPromoCode] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
+  const [currentMembershipPage, setCurrentMembershipPage] = useState(0);
 
-  const itemsPerPage = 10; // 5 baris x 2 kolom
-  const totalPages = Math.ceil(items.length / itemsPerPage);
+  // Diamond pagination: 4 baris x 2 kolom = 8 items
+  const itemsPerPage = 8;
+  const totalPages = Math.ceil(diamondItems.length / itemsPerPage);
   const startIndex = currentPage * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = items.slice(startIndex, endIndex);
+  const currentItems = diamondItems.slice(startIndex, endIndex);
+
+  // Membership pagination: 2 baris x 3 kolom = 6 items
+  const membershipItemsPerPage = 6;
+  const totalMembershipPages = Math.ceil(membershipItems.length / membershipItemsPerPage);
+  const membershipStartIndex = currentMembershipPage * membershipItemsPerPage;
+  const membershipEndIndex = membershipStartIndex + membershipItemsPerPage;
+  const currentMembershipItems = membershipItems.slice(membershipStartIndex, membershipEndIndex);
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -39,6 +52,18 @@ export default function GameDetailPage() {
   const handlePrevPage = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextMembershipPage = () => {
+    if (currentMembershipPage < totalMembershipPages - 1) {
+      setCurrentMembershipPage(currentMembershipPage + 1);
+    }
+  };
+
+  const handlePrevMembershipPage = () => {
+    if (currentMembershipPage > 0) {
+      setCurrentMembershipPage(currentMembershipPage - 1);
     }
   };
 
@@ -164,6 +189,56 @@ Mohon diproses ya kak!
                   <p className="text-sm text-gray-500 mt-1">Pastikan ID yang dimasukkan sudah benar</p>
                 </div>
 
+                {/* Membership Section - dengan carousel 3 kolom 2 baris */}
+                {membershipItems.length > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="block text-sm font-medium text-gray-700">Membership</label>
+                      {totalMembershipPages > 1 && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handlePrevMembershipPage}
+                            disabled={currentMembershipPage === 0}
+                            className="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Previous page"
+                          >
+                            <ChevronLeft size={20} />
+                          </button>
+                          <span className="text-sm text-gray-600">
+                            {currentMembershipPage + 1} / {totalMembershipPages}
+                          </span>
+                          <button
+                            onClick={handleNextMembershipPage}
+                            disabled={currentMembershipPage === totalMembershipPages - 1}
+                            className="p-2 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Next page"
+                          >
+                            <ChevronRight size={20} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      {currentMembershipItems.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => setSelectedItem(item.id)}
+                          className={`p-4 border-2 rounded-lg text-left transition-all ${selectedItem === item.id ? "border-purple-600 bg-purple-50" : "border-gray-300 hover:border-purple-400"}`}
+                        >
+                          <div className="flex flex-col gap-2">
+                            <div>
+                              <p className="font-semibold text-gray-800 text-sm">{item.name}</p>
+                              <p className="text-xs text-gray-600 mt-1">{item.description}</p>
+                            </div>
+                            <p className="font-bold text-purple-600 text-sm">Rp {item.price.toLocaleString("id-ID")}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Diamond Section - dengan carousel */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <label className="block text-sm font-medium text-gray-700">Pilih Nominal</label>
@@ -223,19 +298,19 @@ Mohon diproses ya kak!
                         <span className="font-medium">Rp {selectedItemData.price.toLocaleString("id-ID")}</span>
                       </div>
                     </div>
-
-                    <div className="pt-3 border-t border-purple-200">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Kode Promo (Opsional)</label>
-                      <input
-                        type="text"
-                        value={promoCode}
-                        onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
-                        placeholder="Masukkan kode promo"
-                      />
-                    </div>
                   </div>
                 )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Kode Promo (Opsional)</label>
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                    placeholder="Masukkan kode promo"
+                  />
+                </div>
 
                 <button
                   onClick={handlePurchase}
